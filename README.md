@@ -1,2 +1,2 @@
 # Interview_for_Service_Commision
-this AI generated Interview Master guide with download able pdf file. this app will guide you about your interview especially for PPSC/FPSC/BPSC/KPSC/SPSC/NTS/ETS examination
+This  AI generated Interview  applicaton  guides you about your interview especially of commisson style exams in Pakistan i.e. PPSC/FPSC/BPSC/KPSC/SPSC/NTS/ETS examination
