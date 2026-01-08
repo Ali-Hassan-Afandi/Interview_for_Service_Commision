@@ -3,7 +3,7 @@ import streamlit as st
 from datetime import datetime
 import os
 from fpdf import FPDF
-import google.generativeai as genai
+from groq import Groq
 import re
 import base64
 
@@ -47,19 +47,38 @@ def set_background(image_path):
         unsafe_allow_html=True
     )
 
-# --- API Client ---
-def get_gemini_response(prompt):
+
+# --- GROQ API Client ---
+
+
+def get_groq_response(prompt: str) -> str:
     api_key = os.environ.get("groq")
     if not api_key:
-        return "❌ GEMINI_API_KEY not set. Please add it in Hugging Face 'Secrets'."
+        return "❌ GROQ_API_KEY not set. Please add it to your environment variables."
 
-    genai.configure(api_key=api_key)
-    model = genai.GenerativeModel("gemini-2.0-flash")
     try:
-        response = model.generate_content(prompt + " Use plain text format without markdown, avoid symbols like **, #, or any special formatting.")
-        return response.text
+        client = Groq(api_key=api_key)
+
+        completion = client.chat.completions.create(
+            model="openai/gpt-oss-120b",
+            messages=[
+                {
+                    "role": "user",
+                    "content": prompt + " Respond in plain text only, no markdown formatting."
+                }
+            ],
+            temperature=1,
+            max_completion_tokens=2048,
+            top_p=1,
+            reasoning_effort="medium",
+            stream=False  # IMPORTANT: non-streaming mode
+        )
+
+        return completion.choices[0].message["content"]
+
     except Exception as e:
-        return f"❌ Gemini API Error: {str(e)}"
+        return f"❌ Groq API Error: {str(e)}"
+
 
 # --- Utility Function to Clean Text ---
 def sanitize_text(text):
