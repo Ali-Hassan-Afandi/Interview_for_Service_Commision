@@ -1,4 +1,3 @@
-
 import streamlit as st
 from datetime import datetime
 import os
@@ -7,7 +6,7 @@ from groq import Groq
 import re
 import base64
 
-# --- Styling Improvements ---
+# ---------------------- Background Styling ----------------------
 def set_background(image_path):
     with open(image_path, "rb") as f:
         img_data = f.read()
@@ -48,43 +47,35 @@ def set_background(image_path):
     )
 
 
-# --- GROQ API Client ---
-
-
+# ---------------------- GROQ API Function ----------------------
 def get_groq_response(prompt: str) -> str:
     api_key = os.environ.get("GROQ_API_KEY")
     if not api_key:
-        return "❌ GROQ_API_KEY not set. Please add it to your environment variables."
+        return "ERROR: GROQ_API_KEY not set in environment variables."
 
     try:
         client = Groq(api_key=api_key)
 
         completion = client.chat.completions.create(
-            model="openai/gpt-oss-120b",
-            messages=[
-                {
-                    "role": "user",
-                    "content": prompt + " Respond in plain text only, no markdown formatting."
-                }
-            ],
-            temperature=1,
-            max_completion_tokens=2048,
+            model="llama3-70b-8192",
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.8,
+            max_tokens=2000,
             top_p=1,
-            reasoning_effort="medium",
-            stream=False  # IMPORTANT: non-streaming mode
+            stream=False
         )
 
         return completion.choices[0].message["content"]
 
     except Exception as e:
-        return f"❌ Groq API Error: {str(e)}"
+        return f"GROQ API Error: {str(e)}"
 
 
-# --- Utility Function to Clean Text ---
+# ---------------------- Clean Text ----------------------
 def sanitize_text(text):
     return re.sub(r'[^\x00-\x7F]+', ' ', text)
 
-# --- PDF Generation ---
+# ---------------------- PDF Generator ----------------------
 class PDF(FPDF):
     def header(self):
         self.set_font("Arial", "B", 12)
@@ -96,7 +87,7 @@ class PDF(FPDF):
         self.set_y(-15)
         self.set_font("Arial", "I", 8)
         self.set_text_color(100, 100, 100)
-        footer_text = f"Generated on {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | Created by Mahar Affandi Noor Ghazi - Pace GK Academy | Contact: +92 311 750 5369"
+        footer_text = f"Generated on {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | Pace GK Academy"
         self.cell(0, 10, footer_text, 0, 0, 'C')
 
 def create_pdf(interview_text, note_text, name):
@@ -108,17 +99,15 @@ def create_pdf(interview_text, note_text, name):
     pdf.ln(10)
 
     pdf.set_font("Times", "", 12)
-    interview_lines = sanitize_text(interview_text).split('\n')
-    for line in interview_lines:
+    for line in sanitize_text(interview_text).split('\n'):
         if line.strip():
             pdf.multi_cell(0, 8, line.strip())
-    pdf.ln(10)
+    pdf.ln(8)
 
     pdf.set_font("Times", "B", 14)
     pdf.cell(0, 10, "Special Note", ln=1)
     pdf.set_font("Times", "", 12)
-    note_lines = sanitize_text(note_text).split('\n')
-    for line in note_lines:
+    for line in sanitize_text(note_text).split('\n'):
         if line.strip():
             pdf.multi_cell(0, 8, line.strip())
     
@@ -126,7 +115,7 @@ def create_pdf(interview_text, note_text, name):
     pdf.output(output_path)
     return output_path
 
-# --- Streamlit App ---
+# ---------------------- STREAMLIT APP ----------------------
 st.set_page_config(
     page_title="Interview Generator",
     page_icon="📘",
@@ -134,97 +123,86 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# Set background
-set_background("image.jpg")  # Ensure background.jpg is uploaded
+set_background("image.jpg")
 
-st.title("🎓 Pace GK Academy - Mock Interview Generator")
-st.markdown("""
-    <div style="text-align: center; margin-bottom: 2rem;">
-        <h3 style="color: #1e3c72; font-family: 'Helvetica', sans-serif;">Professional Exam Preparation Toolkit</h3>
-        <p style="color: #2a5298;">Crafting Success Stories for PPSC, FPSC, CSS & PMS Aspirants</p>
-    </div>
-""", unsafe_allow_html=True)
+st.title("Pace GK Academy - Mock Interview Generator")
+st.markdown("<h4 style='text-align:center;color:#1e3c72;'>Professional Exam Preparation Toolkit</h4>", unsafe_allow_html=True)
 
 with st.form("interview_form"):
     cols = st.columns(2)
     with cols[0]:
-        name = st.text_input("Full Name ✍️")
-        father_name = st.text_input("Father's Name 👨")
-        district = st.text_input("District of Domicile 🏙️")
-        tehsil = st.text_input("Tehsil 🗺️")
+        name = st.text_input("Full Name")
+        father_name = st.text_input("Father's Name")
+        district = st.text_input("District")
+        tehsil = st.text_input("Tehsil")
     with cols[1]:
-        bachelors = st.text_input("Bachelor's Degree 🎓")
-        masters = st.text_input("Master's Degree 🎓")
-        department_post = st.text_input("Department & Post 🏛️")
-        exam_type = st.selectbox("Exam Type 📝", ["PPSC", "FPSC", "CSS", "PMS", "Other"])
+        bachelors = st.text_input("Bachelor's Degree")
+        masters = st.text_input("Master's Degree")
+        department_post = st.text_input("Department & Post")
+        exam_type = st.selectbox("Exam Type", ["PPSC", "FPSC", "CSS", "PMS", "Other"])
     
-    hobby = st.text_input("Hobby 🎨")
-    fav_personality = st.text_input("Favorite Personality 🌟")
+    hobby = st.text_input("Hobby")
+    fav_personality = st.text_input("Favorite Personality")
     
-    submitted = st.form_submit_button("🚀 Generate Interview Report")
+    submitted = st.form_submit_button("Generate Interview Report")
 
 if submitted:
     if all([name, father_name, district, tehsil, bachelors, masters, department_post, exam_type, hobby, fav_personality]):
+        
         interview_prompt = f"""
-        Generate a detailed mock interview based on the following Pakistani candidate's profile:
-        - Name: {name}
-        - Father's Name: {father_name}
-        - District: {district}
-        - Tehsil: {tehsil}
-        - Bachelor's Degree: {bachelors}
-        - Master's Degree: {masters}
-        - Exam Type: {exam_type}
-        - Department and Post: {department_post}
-        - Hobby: {hobby}
-        - Favorite Personality: {fav_personality}
-        Include questions from:
-        - Name-based personalities
-        - District/Tehsil-specific geography, history, administration
-        - Educational background
-        - Post/Department-specific issues
-        - Pakistan's geography, national & international affairs, sports
-        - Government projects related to education
-        - Situational judgment and problem-solving
-        - Questions related to religion
-        - Questions related to pre and post Pakistan history
-        - Questions from geography especially countries in international affairs
-        Format all in clear, numbered interview questions.
+        Generate a detailed mock interview for the following Pakistani competitive exam candidate:
+        Name: {name}
+        Father's Name: {father_name}
+        District: {district}
+        Tehsil: {tehsil}
+        Bachelor's Degree: {bachelors}
+        Master's Degree: {masters}
+        Exam Type: {exam_type}
+        Department and Post: {department_post}
+        Hobby: {hobby}
+        Favorite Personality: {fav_personality}
+
+        Required sections:
+        1. Personal introduction questions
+        2. District and tehsil geography, culture and administration
+        3. Subject-based questions linked to degrees
+        4. Department and post-specific technical questions
+        5. Pakistan studies, history, Islamic studies
+        6. International affairs and geography
+        7. Situational judgment & ethical questions
+        8. General knowledge and current affairs
+
+        Provide clear, well-structured, numbered interview questions.
         """
-  
+
         note_prompt = f"""
-        Based on the profile of a candidate applying for the post of {department_post} through {exam_type},
-        give a special note with motivational advice and suggest specific areas the candidate should study.
-        Also suggest good ideas to answer a few important questions.
-        Keep the tone encouraging and professional.
-        """  
+        Write a motivational note for a candidate applying for the post of {department_post} through {exam_type}.
+        Include preparation guidance, important areas to study, and advice on how to answer key questions confidently.
+        Tone must be encouraging, respectful, and professional.
+        """
 
-        with st.spinner("🔍 Analyzing profile and crafting personalized interview..."):
-            interview_text = get_gemini_response(interview_prompt)
-            note_text = get_gemini_response(note_prompt)
+        with st.spinner("Generating personalized interview..."):
+            interview_text = get_groq_response(interview_prompt)
+            note_text = get_groq_response(note_prompt)
 
-        st.success("✅ Interview Generated Successfully!")
-        
-        with st.expander("📋 View Interview Questions", expanded=True):
+        st.success("Interview Generated Successfully")
+
+        with st.expander("Interview Questions"):
             st.write(interview_text)
-        
-        with st.expander("📝 View Special Note", expanded=False):
+
+        with st.expander("Special Note"):
             st.write(note_text)
 
         file_path = create_pdf(interview_text, note_text, name)
+
         with open(file_path, "rb") as f:
             st.download_button(
-                "📄 Download Comprehensive Report",
+                "Download Full Interview Report",
                 f,
                 file_name=file_path,
-                mime="application/pdf",
-                help="Download your personalized interview guide with professional recommendations"
+                mime="application/pdf"
             )
     else:
-        st.warning("⚠️ Please complete all fields to proceed.")
+        st.warning("Please complete all fields before proceeding.")
 
-st.markdown("""
-    <div style="text-align: center; margin-top: 2rem; color: #1e3c72;">
-        <p>📞 Contact: +92 311 750 5369 | 📍 Pace GK Academy</p>
-        <p>💡 Expert Guidance for Competitive Exam Success</p>
-    </div>
-""", unsafe_allow_html=True)
+st.markdown("<p style='text-align:center;color:#1e3c72;'>Pace GK Academy | +92 311 750 5369</p>", unsafe_allow_html=True)
