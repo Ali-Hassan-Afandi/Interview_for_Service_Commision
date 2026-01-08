@@ -52,7 +52,7 @@ def set_background(image_path):
 
 
 def get_groq_response(prompt: str) -> str:
-    api_key = os.environ.get("groq")
+    api_key = os.environ.get("GROQ_API_KEY")
     if not api_key:
         return "❌ GROQ_API_KEY not set. Please add it to your environment variables."
 
