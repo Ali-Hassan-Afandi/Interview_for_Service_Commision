@@ -152,7 +152,7 @@ if submitted:
     if all([name, father_name, district, tehsil, bachelors, masters, department_post, exam_type, hobby, fav_personality]):
         
         interview_prompt = f"""
-        Generate a detailed mock interview for the following Pakistani competitive exam candidate:
+        you are a master interviewer so that Generate a detailed mock interview for the following Pakistani competitive exam candidate:
         Name: {name}
         Father's Name: {father_name}
         District: {district}
@@ -207,4 +207,4 @@ if submitted:
     else:
         st.warning("Please complete all fields before proceeding.")
 
-st.markdown("<p style='text-align:center;color:#1e3c72;'>Pace GK Academy | +92 311 750 5369</p>", unsafe_allow_html=True)
+st.markdown("<p style='text-align:center;color:#1e3c72;'> Lawgineer ali yasir noor  | +92 311 750 5369 </p>", unsafe_allow_html=True)
