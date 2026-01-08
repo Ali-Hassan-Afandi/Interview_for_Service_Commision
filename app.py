@@ -89,7 +89,7 @@ class PDF(FPDF):
         self.set_y(-15)
         self.set_font("Arial", "I", 8)
         self.set_text_color(100, 100, 100)
-        footer_text = f"Generated on {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | Pace GK Academy"
+        footer_text = f"Generated on {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | AG_Stays | Engr | LLB"
         self.cell(0, 10, footer_text, 0, 0, 'C')
 
 def create_pdf(interview_text, note_text, name):
