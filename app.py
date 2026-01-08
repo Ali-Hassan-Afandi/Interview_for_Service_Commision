@@ -65,10 +65,12 @@ def get_groq_response(prompt: str) -> str:
             stream=False
         )
 
-        return completion.choices[0].message["content"]
+        # FIXED → Use dot notation
+        return completion.choices[0].message.content
 
     except Exception as e:
         return f"GROQ API Error: {str(e)}"
+
 
 
 # ---------------------- Clean Text ----------------------
