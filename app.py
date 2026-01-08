@@ -116,7 +116,7 @@ st.set_page_config(
 )
 
 # Set background
-set_background("background.jpg")  # Ensure background.jpg is uploaded
+set_background("image.jpg")  # Ensure background.jpg is uploaded
 
 st.title("🎓 Pace GK Academy - Mock Interview Generator")
 st.markdown("""
