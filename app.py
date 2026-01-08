@@ -125,7 +125,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-set_background("image.jpg")
+set_background("images.jpg")
 
 st.title("Pace GK Academy - Mock Interview Generator")
 st.markdown("<h4 style='text-align:center;color:#1e3c72;'>Professional Exam Preparation Toolkit</h4>", unsafe_allow_html=True)
